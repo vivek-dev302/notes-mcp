@@ -9,8 +9,6 @@ services:
         fromDatabase:
           name: notes-db
           property: connectionString
-      - key: PYTHON_VERSION
-        value: "3.11"
 
 databases:
   - name: notes-db
