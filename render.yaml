@@ -2,6 +2,7 @@ services:
   - type: web
     name: notes-mcp
     runtime: python
+    plan: free
     buildCommand: pip install -r requirements.txt
     startCommand: python mcp_server.py
     envVars:
