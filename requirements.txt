@@ -1,4 +1,4 @@
-fastmcp-slim==4.1.0
+fastmcp-slim[server]==4.1.0
 psycopg2-binary==2.9.10
 python-dotenv==1.2.4
 uvicorn==0.34.0
