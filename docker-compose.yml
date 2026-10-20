@@ -1,0 +1,9 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: notes-pg
+    environment:
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: notes
+    ports:
+      - "5432:5432"

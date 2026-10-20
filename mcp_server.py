@@ -1,8 +1,14 @@
+import os
 from fastmcp import FastMCP
+from dotenv import load_dotenv
+from starlette.middleware.cors import CORSMiddleware
+from starlette.middleware import Middleware
 
 from notes_app import add_note, delete_note, list_notes
 
-mcp = FastMCP("notes")
+load_dotenv()
+
+mcp = FastMCP(name="Notes App")
 
 
 @mcp.tool()
@@ -23,35 +29,28 @@ def delete_a_note(note_id: int) -> str:
     return "deleted" if delete_note(owner="local", note_id=note_id) else "none"
 
 
-# http method running on localhost:8000/mcp
-# if __name__ == "__main__":
-#     mcp.run(transport="http", host="0.0.0.0", port=8000)
+if __name__ == "__main__":
+    mcp.run(
+        transport="http",
+        host="0.0.0.0",                       # bind to all interfaces (required on Render)
+        port=int(os.getenv("PORT", 8000)),     # Render injects $PORT; fallback to 8000 locally
+        middleware=[
+            Middleware(
+                CORSMiddleware,
+                allow_origins=["*"],
+                allow_credentials=True,
+                allow_methods=["*"],
+                allow_headers=["*"],
+            )
+        ]
+    )
 
-# agents mcp config
+
+# MCP client config (HTTP):
 # {
 #     "mcpServers": {
 #         "notes": {
-#           "url": "http://localhost:8000/mcp"
-#          }
-#     }
-# }
-
-
-# stdio method
-if __name__ == "__main__":
-    mcp.run()
-
-# agents mcp config
-# {
-#     "mcpServers": {
-#         "notes-local": {
-#             "command": "uv",
-#             "args": [
-#                 "run",
-#                 " -- directory",
-#                 "/Users/timruscica/descope-mcp-video",
-#                 "v1_local.py"
-#             ]
+#             "url": "http://localhost:8000/mcp"
 #         }
 #     }
 # }
