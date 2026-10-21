@@ -1,5 +1,6 @@
 import os
 from fastmcp import FastMCP
+from fastmcp.server.auth.providers.auth0 import Auth0MCPProvider
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware import Middleware
@@ -8,7 +9,13 @@ from notes_app import add_note, delete_note, list_notes
 
 load_dotenv()
 
-mcp = FastMCP(name="Notes App")
+auth = Auth0MCPProvider(
+    config_url=f"{os.getenv('AUTH0_DOMAIN').rstrip('/')}/.well-known/openid-configuration",
+    base_url=os.getenv("SERVER_BASE_URL"),
+    resource_name="Notes MCP",
+)
+
+mcp = FastMCP(name="Notes App", auth=auth)
 
 
 @mcp.tool()
@@ -44,13 +51,3 @@ if __name__ == "__main__":
             )
         ]
     )
-
-
-# MCP client config (HTTP):
-# {
-#     "mcpServers": {
-#         "notes": {
-#             "url": "http://localhost:8000/mcp"
-#         }
-#     }
-# }
