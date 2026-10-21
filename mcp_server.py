@@ -4,6 +4,8 @@ from fastmcp.server.auth.providers.auth0 import Auth0MCPProvider
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware import Middleware
+from starlette.requests import Request
+from starlette.responses import JSONResponse
 
 from notes_app import add_note, delete_note, list_notes
 
@@ -16,6 +18,11 @@ auth = Auth0MCPProvider(
 )
 
 mcp = FastMCP(name="Notes App", auth=auth)
+
+
+@mcp.custom_route("/", methods=["GET", "HEAD"])
+async def healthcheck(request: Request):
+    return JSONResponse({"status": "ok"})
 
 
 @mcp.tool()
@@ -39,8 +46,9 @@ def delete_a_note(note_id: int) -> str:
 if __name__ == "__main__":
     mcp.run(
         transport="http",
-        host="0.0.0.0",                       # bind to all interfaces (required on Render)
-        port=int(os.getenv("PORT", 8000)),     # Render injects $PORT; fallback to 8000 locally
+        host="0.0.0.0",
+        port=int(os.getenv("PORT", 8000)),
+        stateless_http=True,               # each request is independent — no hanging SSE stream
         middleware=[
             Middleware(
                 CORSMiddleware,
